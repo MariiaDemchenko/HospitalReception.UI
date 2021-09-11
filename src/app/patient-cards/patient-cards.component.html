@@ -1,0 +1,352 @@
+<button class="btn btn-edit-form btn-outline-success" (click)="addPatient()">ADD PATIENT</button>
+<table mat-table [dataSource]="patients" style="width: 100%;">
+    <ng-container matColumnDef="FirstName">
+        <th mat-header-cell *matHeaderCellDef> First Name</th>
+        <td mat-cell *matCellDef="let patient"> {{patient.FirstName}} </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="LastName">
+        <th mat-header-cell *matHeaderCellDef> Last Name</th>
+        <td mat-cell *matCellDef="let patient"> {{patient.LastName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="MiddleName">
+        <th mat-header-cell *matHeaderCellDef> Middle Name </th>
+        <td mat-cell *matCellDef="let patient"> {{patient.MiddleName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Phone">
+        <th mat-header-cell *matHeaderCellDef> Phone</th>
+        <td mat-cell *matCellDef="let patient"> {{patient.PhoneNumber}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Email">
+        <th mat-header-cell *matHeaderCellDef> Email</th>
+        <td mat-cell *matCellDef="let patient"> {{patient.Email}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="BirthDate">
+        <th mat-header-cell *matHeaderCellDef> Birth Date</th>
+        <td mat-cell *matCellDef="let patient"> {{patient.BirthDate}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Gender">
+        <th mat-header-cell *matHeaderCellDef> Gender</th>
+        <td mat-cell *matCellDef="let patient"> {{patient.Gender}} </td>
+      </ng-container>
+
+
+      <ng-container matColumnDef="action-view">
+        <th mat-header-cell *matHeaderCellDef> </th>   
+        <td mat-cell *matCellDef="let patient"> 
+            <a class="selected-icon edit" href='/patients/{{patient.Id}}'>
+                View
+                <i class="fa fa-eye"></i>
+            </a>
+      </ng-container>
+      <ng-container matColumnDef="action-edit">
+        <th mat-header-cell *matHeaderCellDef> </th>   
+        <td mat-cell *matCellDef="let patient"> 
+            <div class="selected-icon edit" (click)="openLg(content, patient.Id)">
+                Edit
+                <i class="fa fa-edit"></i>
+            </div>
+      </ng-container>
+      
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>  
+</table>
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Edit patient card</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" novalidate [formGroup]="myform" (ngSubmit)="onUpload()" [ngClass]="{
+            'has-danger': myform.errors,
+            'has-success': myform.valid
+       }">
+            <div class="row">
+                <div class="col-5">
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                  'has-danger': FirstName.invalid && (FirstName.dirty || FirstName.touched),
+                  'has-success': FirstName.valid && (FirstName.dirty || FirstName.touched)
+             }">
+                            <label>First Name</label>
+                            <input class="form-control" formControlName="FirstName" required>
+                            <div class="form-control-feedback" *ngIf="FirstName.errors && (FirstName.dirty || FirstName.touched)">
+                                <p *ngIf="FirstName.errors && FirstName.errors.required">First name is required</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                  'has-danger': MiddleName.invalid && (MiddleName.dirty || MiddleName.touched),
+                  'has-success': MiddleName.valid && (MiddleName.dirty || MiddleName.touched)
+             }">
+                            <label>Middle Name</label>
+                            <input class="form-control" formControlName="MiddleName" required>
+                            <div class="form-control-feedback" *ngIf="MiddleName.errors && (MiddleName.dirty || MiddleName.touched)">
+                                <p *ngIf="MiddleName.errors && MiddleName.errors.required">Middle name is required</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                                'has-danger': Email.invalid && (Email.dirty || Email.touched),
+                                'has-success': Email.valid && (Email.dirty || Email.touched)
+                           }">
+                            <label>Email</label>
+                            <input type="email" class="form-control" formControlName="Email" required>
+                            <div class="form-control-feedback" *ngIf="Email.errors && (Email.dirty || Email.touched)">
+                                <p *ngIf="Email.errors && Email.errors.required">Email is required</p>
+                                <p *ngIf="Email.errors && Email.errors.pattern">The email address must contain at least the @ character</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                                'has-danger': InformationSource.invalid && (InformationSource.dirty || InformationSource.touched),
+                                'has-success': InformationSource.valid && (InformationSource.dirty || InformationSource.touched)
+                           }">
+                            <label>Information Source</label>
+                            <select (change)="selectedInformationSourceChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let informationSource of informationSources" value={{informationSource.Id}} [selected]="informationSource.Id === selectedPatient.InformationSourceId">
+                                  {{informationSource.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                                'has-danger': Gender.invalid && (Gender.dirty || Gender.touched),
+                                'has-success': Gender.valid && (Gender.dirty || Gender.touched)
+                           }">
+                            <label>Gender</label>
+                            <select (change)="selectedGenderChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let gender of genders" value={{gender.Id}} [selected]="gender.Id === selectedPatient.GenderId">
+                                  {{gender.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                                'has-danger': LocalityType.invalid && (LocalityType.dirty || LocalityType.touched),
+                                'has-success': LocalityType.valid && (LocalityType.dirty || LocalityType.touched)
+                           }">
+                            <label>Locality Type</label>
+                            <select (change)="selectedLocalityTypeChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let localityType of localityTypes" value={{localityType.Id}} [selected]="localityType.Id === selectedPatient.LocalityTypeId">
+                                  {{localityType.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                                'has-danger': Region.invalid && (Region.dirty || Region.touched),
+                                'has-success': Region.valid && (Region.dirty || Region.touched)
+                           }">
+                            <label>Region</label>
+                            <select (change)="selectedRegionChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let region of regions" value={{region.Id}} [selected]="region.Id === selectedPatient.RegionId">
+                                  {{region.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                                'has-danger': Policlinic.invalid && (Policlinic.dirty || Policlinic.touched),
+                                'has-success': Policlinic.valid && (Policlinic.dirty || Policlinic.touched)
+                           }">
+                            <label>Policlinic</label>
+                            <select (change)="selectedPoliclinicChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let policlinic of policlinics" value={{policlinic.Id}} [selected]="policlinic.Id === selectedPatient.PoliclinicId">
+                                  {{policlinic.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <label>Birth Date</label>
+                    <form >
+                        <div>
+                            <div class="input-group">
+                                <input class="form-control" placeholder="yyyy-mm-dd" name="d2" #c2="ngModel" [(ngModel)]="selectedBirthDate" ngbDatepicker
+                                    #d2="ngbDatepicker">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" (click)="d2.toggle()" type="button">
+                                        <i class="fa fa-calendar-alt" style="width: 1.2rem; height: 1rem; cursor: pointer;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                    <button type="button" (click)="editPatient()" class="row input-item btn btn-outline-primary btn-menu" [disabled]="!myform.valid">SAVE CHANGES</button>
+
+                </div>
+                <div class="col-5">
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                      'has-danger': LastName.invalid && (LastName.dirty || LastName.touched),
+                      'has-success': LastName.valid && (LastName.dirty || LastName.touched)
+                 }">
+                            <label>Last Name</label>
+                            <input class="form-control" formControlName="LastName" required>
+                            <div class="form-control-feedback" *ngIf="LastName.errors && (LastName.dirty || LastName.touched)">
+                                <p *ngIf="LastName.errors && LastName.errors.required">Last name is required</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                          'has-danger': PhoneNumber.invalid && (PhoneNumber.dirty || PhoneNumber.touched),
+                          'has-success': PhoneNumber.valid && (PhoneNumber.dirty || PhoneNumber.touched)
+                     }">
+                            <label>Phone</label>
+                            <input class="form-control" formControlName="PhoneNumber" required>
+                            <div class="form-control-feedback" *ngIf="PhoneNumber.errors && (PhoneNumber.dirty || PhoneNumber.touched)">
+                                <p *ngIf="PhoneNumber.errors && PhoneNumber.errors.required">Phone is required</p>
+                                <p *ngIf="PhoneNumber.errors && PhoneNumber.errors.pattern">The phone number must contain only numbers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                                'has-danger': Education.invalid && (Education.dirty || Education.touched),
+                                'has-success': Education.valid && (Education.dirty || Education.touched)
+                           }">
+                            <label>Education</label>
+                            <select (change)="selectedEducationTypeChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let educationType of educationTypes" value={{educationType.Id}} [selected]="educationType.Id === selectedPatient.EducationId">
+                                  {{educationType.Name}}
+                                </option>
+                              </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div [ngClass]="{
+                                'has-danger': DisabilityGroup.invalid && (DisabilityGroup.dirty || DisabilityGroup.touched),
+                                'has-success': DisabilityGroup.valid && (DisabilityGroup.dirty || DisabilityGroup.touched)
+                           }">
+                            <label>Disability Group</label>
+                            <select (change)="selectedDisabilityGroupChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let disabilityGroup of disabilityGroups" value={{disabilityGroup.Id}} [selected]="disabilityGroup.Id === selectedPatient.DisabilityGroupId">
+                                  {{disabilityGroup.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                                'has-danger': HabitationMember.invalid && (HabitationMember.dirty || HabitationMember.touched),
+                                'has-success': HabitationMember.valid && (HabitationMember.dirty || HabitationMember.touched)
+                           }">
+                            <label>Habitation Member</label>
+                            <select (change)="selectedHabitationMemberChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let habitationMember of habitationMembers" value={{habitationMember.Id}} [selected]="habitationMember.Id === selectedPatient.HabitationMemberId">
+                                  {{habitationMember.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div class="form-group" [ngClass]="{
+                            'has-danger': Employment.invalid && (Employment.dirty || Employment.touched),
+                            'has-success': Employment.valid && (Employment.dirty || Employment.touched)
+                       }">
+                            <label>Employment Type</label>
+                            <select (change)="selectedEmploymentTypeChanged($event.target.value)" class="form-control">
+
+                                <option *ngFor="let employment of employmentTypes" value={{employment.Id}} [selected]="employment.Id === selectedPatient.EmploymentId">
+                                  {{employment.Name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row input-item">
+                        <div>
+                            <label>Locality Name</label>
+                            <input class="form-control" formControlName="LocalityName" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+    </div>
+</ng-template>
+
+<div class="row">
+    <div *ngFor="let patient of patients" class="col-6 text-center">
+        <div class="photo img-thumbnail">
+            <div class="photo-frame d-flex">
+                <div class="panel panel-default image-footer image">
+                    <table class="table table-bordered table-striped image">
+                        <thead>
+                            <tr class="table-active">
+                                <th colspan="2">{{patient.FirstName}} {{patient.LastName}}</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>
+                                Phone
+                            </td>
+                            <td>
+                                {{patient.PhoneNumber }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Email
+                            </td>
+                            <td>
+                                {{patient.Email }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                BirthDate
+                            </td>
+                            <td>
+                                {{patient.BirthDate }}
+                            </td>
+                        </tr>
+                        <tr class="table-success">
+                            <td>
+                                <a class="selected-icon edit" href='/patients/{{patient.Id}}'>
+                                    View
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                            </td>
+                            
+                            <td>
+                                <div class="selected-icon edit" (click)="openLg(content, patient.Id)">
+                                    Edit
+                                    <i class="fa fa-edit"></i>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
